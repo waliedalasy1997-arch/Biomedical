@@ -10,30 +10,212 @@
         .container { max-width: 1550px; margin: 0 auto; }
         .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .header-card { background: linear-gradient(135deg, #0b2b44, #1e4a76); color: white; text-align: center; padding: 25px; border-radius: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-        .tab-btn { background: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+        .tab-btn { background: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-btn.active { background: #1e4a76; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; align-items: end; }
-        input, select, textarea { padding: 12px; border-radius: 10px; border: 1px solid #ccc; width: 100%; font-size: 14px; }
-        label { font-size: 13px; font-weight: bold; color: #444; display: block; margin-bottom: 5px; }
-        .btn { padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .btn-success { background: #27ae60; color: white; }
-        .btn-info { background: #2980b9; color: white; margin: 5px; }
-        .btn-edit { background: #f39c12; color: white; padding: 5px 10px; border-radius: 5px; }
-        .btn-close { background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 10px; overflow: hidden; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: #f8fafc; color: #333; }
-        .expired-row { background: #ffeaea !important; border: 2px solid #ff4d4d; } /* عقد منتهي */
-        .warning-row { background: #fff9e6 !important; border: 2px solid #f1c40f; } /* قرب ينتهي */
-        .stat-box { flex: 1; min-width: 200px; padding: 20px; background: #fff; border-radius: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; align-items: end; }
+        input, select, textarea { padding: 10px; border-radius: 10px; border: 1px solid #cbd5e6; width: 100%; font-size: 14px; }
+        label { font-size: 12px; font-weight: bold; color: #64748b; display: block; margin-bottom: 5px; margin-right: 5px; }
+        .btn { padding: 8px 18px; border-radius: 30px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-success { background: #1f8a4c; color: white; }
+        .btn-info { background: #2c6e9e; color: white; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-close { background: #27ae60; color: white; }
+        .table-wrapper { overflow-x: auto; border-radius: 15px; border: 1px solid #e2e8f0; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; background: white; }
+        th, td { border: 1px solid #f1f5f9; padding: 12px; text-align: center; font-size: 13px; }
+        th { background: #f8fafc; color: #475569; }
+        .expired-row { background: #ffeaea !important; }
+        .warning-row { background: #fff9e6 !important; }
+        .stat-box { flex: 1; min-width: 180px; padding: 15px; background: #fff; border-radius: 15px; text-align: center; border: 1px solid #d0e4f7; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="card header-card">
+        <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('dashboard')">📊 الإحصائيات</button>
+        <button class="tab-btn" onclick="showTab('devicesTab')">🩺 الأجهزة</button>
+        <button class="tab-btn" onclick="showTab('faultsTab')">🔧 الأعطال</button>
+        <button class="tab-btn" onclick="showTab('contractsTab')">📄 العقود</button>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
+        <div class="card"><div style="display:flex; gap:15px; flex-wrap:wrap;" id="stats"></div></div>
+    </div>
+
+    <div id="devicesTab" class="tab-content">
+        <div class="card">
+            <h3>➕ إضافة / تعديل جهاز</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxDev" value="-1">
+                <div><label>القسم</label><select id="devDept"><option>العناية المركزة</option><option>الطوارئ</option><option>الأشعة</option><option>المناظير</option><option>العمليات</option></select></div>
+                <div><label>اسم الجهاز</label><input type="text" id="devName"></div>
+                <div><label>الماركة</label><input type="text" id="devBrand"></div>
+                <div><label>الموديل</label><input type="text" id="devModel"></div>
+                <div><label>S/N</label><input type="text" id="devSN"></div>
+                <div><label>الوكيل</label><input type="text" id="devAgent"></div>
+                <button class="btn btn-success" onclick="addDevice()">➕ حفظ</button>
+            </div>
+            <button class="btn btn-info" onclick="printReport('devTable', 'تقرير الأجهزة')">🖨️ طباعة الأجهزة</button>
+            <div class="table-wrapper"><table id="devTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="faultsTab" class="tab-content">
+        <div class="card">
+            <h3>🔧 تسجيل بلاغ عطل</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxFault" value="-1">
+                <div><label>القسم</label><select id="fDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="fDevice"></div>
+                <div><label>الموديل</label><input type="text" id="fModel"></div>
+                <div><label>تاريخ البلاغ</label><input type="date" id="fDate"></div>
+                <div style="grid-column: span 2;"><label>وصف العطل</label><textarea id="fDesc"></textarea></div>
+                <button class="btn btn-success" onclick="addFault()">➕ تسجيل</button>
+            </div>
+            <button class="btn btn-info" onclick="printReport('fActiveTable', 'الأعطال النشطة')">🖨️ طباعة النشطة</button>
+            <button class="btn btn-info" onclick="printReport('fClosedTable', 'سجل الإصلاح')">🖨️ طباعة سجل الإصلاح</button>
+            
+            <h4>🔧 أعطال نشطة</h4>
+            <div class="table-wrapper"><table id="fActiveTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الموديل</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+            
+            <h4 style="margin-top:20px;">✅ سجل الإصلاح</h4>
+            <div class="table-wrapper"><table id="fClosedTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الموديل</th><th>تاريخ الإصلاح</th><th>الإجراءات</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="contractsTab" class="tab-content">
+        <div class="card">
+            <h3>📄 إدارة العقود</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxContract" value="-1">
+                <div><label>القسم</label><select id="cDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="cDevice"></div>
+                <div><label>الماركة</label><input type="text" id="cBrand"></div>
+                <div><label>الموديل</label><input type="text" id="cModel"></div>
+                <div><label>S/N</label><input type="text" id="cSN"></div>
+                <div><label>نهاية العقد</label><input type="date" id="cEnd"></div>
+                <div><label>الشركة</label><input type="text" id="cAgent"></div>
+                <button class="btn btn-success" onclick="addContract()">➕ حفظ العقد</button>
+            </div>
+            <button class="btn btn-info" onclick="printReport('cTable', 'تقرير العقود')">🖨️ طباعة العقود</button>
+            <div class="table-wrapper"><table id="cTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>نهاية العقد</th><th>الشركة</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+
+    let devices = JSON.parse(localStorage.getItem('devices')) || [];
+    let activeFaults = JSON.parse(localStorage.getItem('activeFaults')) || [];
+    let closedFaults = JSON.parse(localStorage.getItem('closedFaults')) || [];
+    let contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+
+    function save() {
+        localStorage.setItem('devices', JSON.stringify(devices));
+        localStorage.setItem('activeFaults', JSON.stringify(activeFaults));
+        localStorage.setItem('closedFaults', JSON.stringify(closedFaults));
+        localStorage.setItem('contracts', JSON.stringify(contracts));
+        renderAll();
+    }
+
+    function sync(data, sheet) {
+        let fd = new FormData(); fd.append('targetSheet', sheet);
+        Object.keys(data).forEach(k => fd.append(k, data[k]));
+        fetch(SCRIPT_URL, {method:'POST', body:fd}).catch(e=>console.log('Sync Error'));
+    }
+
+    function addDevice() {
+        let idx = document.getElementById('editIdxDev').value;
+        let obj = { dept: document.getElementById('devDept').value, name: document.getElementById('devName').value, brand: document.getElementById('devBrand').value, model: document.getElementById('devModel').value, sn: document.getElementById('devSN').value, agent: document.getElementById('devAgent').value };
+        if(idx == "-1") { devices.push(obj); sync(obj, 'الأجهزة'); } else { devices[idx] = obj; document.getElementById('editIdxDev').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addFault() {
+        let idx = document.getElementById('editIdxFault').value;
+        let obj = { dept: document.getElementById('fDeptForm').value, device: document.getElementById('fDevice').value, model: document.getElementById('fModel').value, date: document.getElementById('fDate').value, desc: document.getElementById('fDesc').value };
+        if(idx == "-1") { activeFaults.push(obj); sync(obj, 'الأعطال'); } else { activeFaults[idx] = obj; document.getElementById('editIdxFault').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addContract() {
+        let idx = document.getElementById('editIdxContract').value;
+        let obj = { dept: document.getElementById('cDeptForm').value, device: document.getElementById('cDevice').value, brand: document.getElementById('cBrand').value, model: document.getElementById('cModel').value, sn: document.getElementById('cSN').value, end: document.getElementById('cEnd').value, agent: document.getElementById('cAgent').value };
+        if(idx == "-1") { contracts.push(obj); sync(obj, 'العقود'); } else { contracts[idx] = obj; document.getElementById('editIdxContract').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function closeFault(i) {
+        let f = activeFaults.splice(i, 1)[0];
+        f.closedDate = new Date().toLocaleDateString('ar-EG');
+        f.actions = prompt("الإجراءات المتخذة:");
+        closedFaults.push(f); sync(f, 'الأعطال_المغلقة'); save();
+    }
+
+    function editItem(type, i) {
+        let item;
+        if(type === 'dev') { item = devices[i]; document.getElementById('devName').value = item.name; document.getElementById('devModel').value = item.model; document.getElementById('devSN').value = item.sn; document.getElementById('editIdxDev').value = i; showTab('devicesTab'); }
+        else if(type === 'active') { item = activeFaults[i]; document.getElementById('fDevice').value = item.device; document.getElementById('fDesc').value = item.desc; document.getElementById('editIdxFault').value = i; showTab('faultsTab'); }
+        else if(type === 'closed') { item = closedFaults[i]; document.getElementById('fDevice').value = item.device; document.getElementById('fModel').value = item.model; closedFaults.splice(i,1); showTab('faultsTab'); }
+        else if(type === 'contract') { item = contracts[i]; document.getElementById('cDevice').value = item.device; document.getElementById('cEnd').value = item.end; document.getElementById('editIdxContract').value = i; showTab('contractsTab'); }
+        window.scrollTo(0,0);
+    }
+
+    function renderAll() {
+        document.querySelector('#devTable tbody').innerHTML = devices.map((d,i)=>`<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button class="btn btn-edit" onclick="editItem('dev', ${i})">✏️</button></td></tr>`).join('');
+        document.querySelector('#fActiveTable tbody').innerHTML = activeFaults.map((f,i)=>`<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.model}</td><td>${f.desc}</td><td>${f.date}</td><td><button class="btn btn-close" onclick="closeFault(${i})">✅</button><button class="btn btn-edit" onclick="editItem('active', ${i})">✏️</button></td></tr>`).join('');
+        document.querySelector('#fClosedTable tbody').innerHTML = closedFaults.map((f,i)=>`<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.model}</td><td>${f.closedDate}</td><td>${f.actions}</td><td><button class="btn btn-edit" onclick="editItem('closed', ${i})">✏️</button></td></tr>`).join('');
+        
+        document.querySelector('#cTable tbody').innerHTML = contracts.map((c,i)=>{
+            let days = Math.ceil((new Date(c.end) - new Date())/(1000*60*60*24));
+            let cls = days < 0 ? 'expired-row' : (days < 60 ? 'warning-row' : '');
+            return `<tr class="${cls}"><td>${c.dept}</td><td>${c.device}</td><td>${c.brand}</td><td>${c.model}</td><td>${c.sn}</td><td>${c.end}</td><td>${c.agent}</td><td><button class="btn btn-edit" onclick="editItem('contract', ${i})">✏️</button></td></tr>`;
+        }).join('');
+
+        let expCount = contracts.filter(c => Math.ceil((new Date(c.end) - new Date())/(1000*60*60*24)) < 60).length;
+        document.getElementById('stats').innerHTML = `
+            <div class="stat-box"><h3>الأجهزة</h3><h2>${devices.length}</h2></div>
+            <div class="stat-box" style="color:#b91c1c;"><h3>أعطال نشطة</h3><h2>${activeFaults.length}</h2></div>
+            <div class="stat-box" style="color:#f39c12;"><h3>تنبيه عقود</h3><h2>${expCount}</h2></div>
+        `;
+        updateFilters();
+    }
+
+    function printReport(tableId, title) {
+        let win = window.open('', '_blank');
+        win.document.write(`<html dir="rtl"><body><h2 style="text-align:center;">${title}</h2>${document.getElementById(tableId).outerHTML}<style>table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #000;padding:10px;text-align:center;} .btn{display:none;}</style></body></html>`);
+        win.document.close(); win.print();
+    }
+
+    function updateFilters() {
+        let dpts = [...new Set(devices.map(d => d.dept))];
+        ['fDeptForm', 'cDeptForm'].forEach(id => {
+            let sel = document.getElementById(id); if(sel) sel.innerHTML = dpts.map(d=>`<option>${d}</option>`).join('');
+        });
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function resetForms() { document.querySelectorAll('input, textarea').forEach(i => i.value = ''); }
+
+    window.onload = renderAll;
+</script>
+</body>
+</html>
     <div class="card header-card">
         <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
     </div>
