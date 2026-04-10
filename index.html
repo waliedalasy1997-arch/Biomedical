@@ -6,34 +6,268 @@
     <title>نظام الهندسة الطبية - جامعة المنوفية</title>
     <style>
         :root {
-            --primary-blue: #1e4a76;
-            --header-bg: #2c5e8c;
-            --bg-light: #f4f7f9;
+            --main-blue: #2c5e8c;
+            --light-blue: #e2edf7;
+            --bg-color: #f0f2f5;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background-color: var(--bg-light); color: #333; }
-        
-        /* Header Style from Photo */
-        .main-header {
-            background-color: var(--header-bg);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 0 0 50px 50px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .main-header h1 { font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); padding: 10px; }
 
-        /* Tabs Style */
-        .nav-tabs {
+        /* Header - طبق الأصل من الصورة */
+        .header {
+            background-color: #1e4a76;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 20px;
+            margin: 10px auto 20px;
+            max-width: 95%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 24px; margin: 0; }
+
+        /* Navigation Tabs */
+        .nav-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
-        .tab-btn {
-            background: #fff;
+        .nav-item {
+            background: var(--light-blue);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #444;
+            transition: 0.3s;
+            border: 1px solid #d1dae3;
+        }
+        .nav-item.active { background-color: #1e4a76; color: white; }
+
+        /* Container & Cards */
+        .main-card {
+            background: #ffffffba;
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px;
+            max-width: 98%;
+            margin: 0 auto;
+            min-height: 80vh;
+            border: 1px solid #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Stats Cards Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid #e2edf7;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .stat-box h3 { font-size: 16px; color: #555; margin-bottom: 10px; }
+        .stat-box .num { font-size: 32px; font-weight: bold; color: #1e4a76; }
+
+        /* Form Styling - نفس ترتيب الصورة */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px dashed #ccc;
+            align-items: flex-end;
+            margin-bottom: 30px;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 140px; }
+        .input-group label { font-size: 12px; color: #777; margin-right: 5px; }
+        input, select, textarea {
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid #ced4da;
+            background: white;
+            font-size: 14px;
+        }
+        .btn-save {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 42px;
+        }
+
+        /* Table Design */
+        .table-wrapper { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        th { padding: 15px; text-align: right; color: #666; font-size: 14px; font-weight: 500; }
+        td { background: white; padding: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; font-size: 14px; }
+        td:first-child { border-right: 1px solid #eee; border-radius: 0 15px 15px 0; }
+        td:last-child { border-left: 1px solid #eee; border-radius: 15px 0 0 15px; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية 🏥</h1>
+</div>
+
+<div class="nav-container">
+    <div class="nav-item" onclick="openTab('stats')">📊 الإحصائيات</div>
+    <div class="nav-item active" onclick="openTab('devices')">🩺 الأجهزة</div>
+    <div class="nav-item" onclick="openTab('faults')">🔧 الأعطال</div>
+    <div class="nav-item" onclick="openTab('contracts')">📄 العقود</div>
+</div>
+
+<div class="main-card">
+    
+    <div id="stats" class="tab-content hidden">
+        <div class="stats-grid">
+            <div class="stat-box"><h3>📋 إجمالي الأجهزة</h3><div id="count-dev" class="num">0</div></div>
+            <div class="stat-box" style="border-bottom: 4px solid #e74c3c;"><h3>⚠️ أعطال نشطة</h3><div id="count-active" class="num" style="color:#e74c3c">0</div></div>
+            <div class="stat-box" style="border-bottom: 4px solid #27ae60;"><h3>✅ تم إصلاحها</h3><div id="count-fixed" class="num" style="color:#27ae60">0</div></div>
+            <div class="stat-box"><h3>📄 عقود أوشكت</h3><div id="count-cont" class="num" style="color:#f39c12">0</div></div>
+        </div>
+    </div>
+
+    <div id="devices" class="tab-content">
+        <div class="section-title">➕ إضافة / تعديل جهاز</div>
+        <div class="form-row">
+            <div class="input-group"><label>القسم</label><select id="d-dept"><option>العناية المركزة</option><option>الطوارئ</option><option>التعقيم</option></select></div>
+            <div class="input-group"><label>اسم الجهاز</label><input type="text" id="d-name"></div>
+            <div class="input-group"><label>الماركة</label><input type="text" id="d-brand"></div>
+            <div class="input-group"><label>الموديل</label><input type="text" id="d-model"></div>
+            <div class="input-group"><label>S/N</label><input type="text" id="d-sn"></div>
+            <div class="input-group"><label>الوكيل</label><input type="text" id="d-agent"></div>
+            <button class="btn-save" onclick="uploadData('devices')">➕ حفظ</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead>
+                <tbody id="tbody-devices"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="faults" class="tab-content hidden">
+        <div class="section-title">⚠️ تسجيل بلاغ عطل</div>
+        <div class="form-row">
+            <div class="input-group"><label>القسم</label><select id="f-dept"><option>التعقيم</option><option>عمليات المسالك</option></select></div>
+            <div class="input-group"><label>الجهاز</label><input type="text" id="f-dev"></div>
+            <div class="input-group"><label>الماركة</label><input type="text" id="f-brand"></div>
+            <div class="input-group"><label>الموديل</label><input type="text" id="f-model"></div>
+            <div class="input-group"><label>S/N</label><input type="text" id="f-sn"></div>
+            <div class="input-group"><label>التاريخ</label><input type="date" id="f-date"></div>
+            <div class="input-group"><label>وصف العطل</label><textarea id="f-desc"></textarea></div>
+            <div class="input-group"><label>الإجراءات المتخذة</label><textarea id="f-act"></textarea></div>
+            <button class="btn-save" style="background:#2c3e50" onclick="uploadData('faults')">📝 تسجيل</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+                <tbody id="tbody-faults"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+
+    // مخزن البيانات المحلي
+    let localDB = {
+        devices: JSON.parse(localStorage.getItem('off_dev')) || [],
+        faults: JSON.parse(localStorage.getItem('off_fault')) || []
+    };
+
+    function openTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+    }
+
+    function uploadData(type) {
+        let data = {};
+        if(type === 'devices') {
+            data = {
+                targetSheet: 'الأجهزة',
+                dept: document.getElementById('d-dept').value,
+                name: document.getElementById('d-name').value,
+                brand: document.getElementById('d-brand').value,
+                model: document.getElementById('d-model').value,
+                sn: document.getElementById('d-sn').value,
+                agent: document.getElementById('d-agent').value
+            };
+            localDB.devices.push(data);
+            localStorage.setItem('off_dev', JSON.stringify(localDB.devices));
+        } else {
+            data = {
+                targetSheet: 'الأعطال',
+                dept: document.getElementById('f-dept').value,
+                device: document.getElementById('f-dev').value,
+                brand: document.getElementById('f-brand').value,
+                sn: document.getElementById('f-sn').value,
+                date: document.getElementById('f-date').value,
+                desc: document.getElementById('f-desc').value,
+                actions: document.getElementById('f-act').value
+            };
+            localDB.faults.push(data);
+            localStorage.setItem('off_fault', JSON.stringify(localDB.faults));
+        }
+
+        // إرسال للسيرفر (Google Sheets)
+        fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams(data) })
+        .then(r => console.log("Done"))
+        .catch(e => console.log("Offline Save"));
+
+        renderTables();
+        alert("تم الحفظ والإرسال بنجاح");
+    }
+
+    function renderTables() {
+        document.getElementById('tbody-devices').innerHTML = localDB.devices.map(d => 
+            `<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button style="border:none; background:#f39c12; color:white; padding:5px 10px; border-radius:8px;">✎</button></td></tr>`
+        ).join('');
+
+        document.getElementById('tbody-faults').innerHTML = localDB.faults.map(f => 
+            `<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.brand}</td><td>${f.sn}</td><td>${f.desc}</td><td>${f.date}</td><td><button style="border:none; background:#f39c12; color:white; padding:5px 10px; border-radius:8px;">✎</button></td></tr>`
+        ).join('');
+
+        document.getElementById('count-dev').innerText = localDB.devices.length;
+        document.getElementById('count-active').innerText = localDB.faults.length;
+    }
+
+    window.onload = renderTables;
+</script>
+</body>
+</html>
             border: 1px solid #ddd;
             padding: 8px 20px;
             border-radius: 10px;
