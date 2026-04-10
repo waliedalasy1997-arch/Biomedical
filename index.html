@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>نظام الهندسة الطبية - جامعة المنوفية</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #eef2f7; padding: 20px; }
+        .container { max-width: 1550px; margin: 0 auto; }
+        .card { background: white; border-radius: 24px; padding: 20px 25px; margin-bottom: 25px; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
+        .header-card { background: linear-gradient(135deg, #0b2b44, #1e4a76); color: white; text-align: center; }
+        .btn { border: none; padding: 8px 18px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin: 3px; }
+        .btn-success { background: #1f8a4c; color: white; }
+        .btn-info { background: #2c6e9e; color: white; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-close { background: #27ae60; color: white; }
+        input, select, textarea { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e6; font-size: 14px; width: 100%; background: #fff; margin-bottom: 5px; }
+        label { font-size: 12px; color: #64748b; display: block; margin-bottom: 2px; margin-right: 5px; }
+        .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 15px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1350px; }
+        th { background: #f8fafc; padding: 12px; text-align: right; color: #475569; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .tab-btn { background: white; border: none; padding: 10px 22px; border-radius: 50px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab-btn.active { background: #1e4a76; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; align-items: end; }
+        .filter-bar { background: #f1f5f9; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .stat-box { background: #f0f7ff; padding: 20px; border-radius: 20px; flex: 1; min-width: 200px; text-align: center; border: 1px solid #d0e4f7; }
+        .expired-row { background: #ffeaea !important; }
+        .warning-row { background: #fff9e6 !important; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card header-card">
+        <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('dashboard')">📊 الإحصائيات</button>
+        <button class="tab-btn" onclick="showTab('devicesTab')">🩺 الأجهزة</button>
+        <button class="tab-btn" onclick="showTab('faultsTab')">🔧 الأعطال</button>
+        <button class="tab-btn" onclick="showTab('contractsTab')">📄 العقود</button>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
+        <div class="card"><div style="display:flex; gap:15px; flex-wrap:wrap;" id="stats"></div></div>
+    </div>
+
+    <div id="devicesTab" class="tab-content">
+        <div class="card">
+            <h3>➕ إضافة / تعديل جهاز</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxDev" value="-1">
+                <div><label>القسم</label><select id="devDept"><option value="العناية المركزة">العناية المركزة</option><option value="الطوارئ">الطوارئ</option><option value="الأشعة">الأشعة</option><option value="--- قسم جديد ---">--- قسم جديد ---</option></select></div>
+                <input type="text" id="devNewDept" placeholder="اسم القسم الجديد" style="display:none;">
+                <div><label>اسم الجهاز</label><input type="text" id="devName"></div>
+                <div><label>الماركة</label><input type="text" id="devBrand"></div>
+                <div><label>الموديل</label><input type="text" id="devModel"></div>
+                <div><label>S/N</label><input type="text" id="devSN"></div>
+                <div><label>الوكيل</label><input type="text" id="devAgent"></div>
+                <button class="btn btn-success" id="btnDev" onclick="addDevice()">➕ حفظ</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية بالقسم:</label>
+                <select id="filterDev" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('devices')">🖨️ طباعة التقرير</button>
+            </div>
+            <div class="table-wrapper"><table id="devTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="faultsTab" class="tab-content">
+        <div class="card">
+            <h3>⚠️ تسجيل بلاغ عطل</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxFault" value="-1">
+                <div><label>القسم</label><select id="fDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="fDevice"></div>
+                <div><label>الماركة</label><input type="text" id="fBrand"></div>
+                <div><label>الموديل</label><input type="text" id="fModel"></div>
+                <div><label>S/N</label><input type="text" id="fSN"></div>
+                <div><label>التاريخ</label><input type="date" id="fDate"></div>
+                <textarea id="fDesc" placeholder="وصف العطل"></textarea>
+                <textarea id="fActions" placeholder="الإجراءات المتخذة"></textarea>
+                <button class="btn btn-success" id="btnFault" onclick="addFault()">➕ تسجيل</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية الأعطال بالقسم:</label>
+                <select id="filterFaults" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('activeFaults')">🖨️ طباعة النشطة</button>
+                <button class="btn btn-info" onclick="printReport('closedFaults')">🖨️ سجل الإصلاح</button>
+            </div>
+            <h4>🔧 أعطال نشطة</h4>
+            <div class="table-wrapper"><table id="fActiveTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+            <h4 style="margin-top:20px;">✅ سجل الأعطال المغلقة</h4>
+            <div class="table-wrapper"><table id="fClosedTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>تاريخ الإصلاح</th><th>الإجراءات</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="contractsTab" class="tab-content">
+        <div class="card">
+            <h3>📄 إدارة العقود</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxContract" value="-1">
+                <div><label>القسم</label><select id="cDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="cDevice"></div>
+                <div><label>الماركة</label><input type="text" id="cBrand"></div>
+                <div><label>الموديل</label><input type="text" id="cModel"></div>
+                <div><label>S/N</label><input type="text" id="cSN"></div>
+                <div><label>الشركة / الوكيل</label><input type="text" id="cAgent"></div>
+                <div><label>بداية العقد</label><input type="date" id="cStart"></div>
+                <div><label>نهاية العقد</label><input type="date" id="cEnd"></div>
+                <div><label>الحالة / النوع</label><input type="text" id="cStatus"></div>
+                <button class="btn btn-success" id="btnContract" onclick="addContract()">➕ حفظ العقد</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية العقود بالقسم:</label>
+                <select id="filterContracts" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('contracts')">🖨️ طباعة العقود</button>
+            </div>
+            <div class="table-wrapper"><table id="cTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>بداية العقد</th><th>نهاية العقد</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxmd64V4UswZ2Bpz0wwjcghTee6HJv9v0e06CecannW9wUhIfumnroi1sXorttzPHN/exec';
+
+    let devices = JSON.parse(localStorage.getItem('devices')) || [];
+    let activeFaults = JSON.parse(localStorage.getItem('activeFaults')) || [];
+    let closedFaults = JSON.parse(localStorage.getItem('closedFaults')) || [];
+    let contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+
+    function save() {
+        localStorage.setItem('devices', JSON.stringify(devices));
+        localStorage.setItem('activeFaults', JSON.stringify(activeFaults));
+        localStorage.setItem('closedFaults', JSON.stringify(closedFaults));
+        localStorage.setItem('contracts', JSON.stringify(contracts));
+        renderAll();
+    }
+
+    function sync(data, sheet) {
+        let fd = new FormData(); fd.append('targetSheet', sheet);
+        Object.keys(data).forEach(k => fd.append(k, data[k]));
+        fetch(SCRIPT_URL, {method:'POST', body:fd}).catch(e=>console.log('Sync Error'));
+    }
+
+    function addDevice() {
+        let idx = document.getElementById('editIdxDev').value;
+        let dpt = document.getElementById('devDept').value === '--- قسم جديد ---' ? document.getElementById('devNewDept').value : document.getElementById('devDept').value;
+        let obj = { dept: dpt, name: document.getElementById('devName').value, brand: document.getElementById('devBrand').value, model: document.getElementById('devModel').value, sn: document.getElementById('devSN').value, agent: document.getElementById('devAgent').value };
+        if(idx == "-1") { devices.push(obj); sync(obj, 'الأجهزة'); } else { devices[idx] = obj; document.getElementById('editIdxDev').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addFault() {
+        let idx = document.getElementById('editIdxFault').value;
+        let obj = { dept: document.getElementById('fDeptForm').value, device: document.getElementById('fDevice').value, brand: document.getElementById('fBrand').value, model: document.getElementById('fModel').value, sn: document.getElementById('fSN').value, date: document.getElementById('fDate').value, desc: document.getElementById('fDesc').value, actions: document.getElementById('fActions').value };
+        if(idx == "-1") { activeFaults.push(obj); sync(obj, 'الأعطال'); } else { activeFaults[idx] = obj; document.getElementById('editIdxFault').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addContract() {
+        let idx = document.getElementById('editIdxContract').value;
+        let obj = { dept: document.getElementById('cDeptForm').value, device: document.getElementById('cDevice').value, brand: document.getElementById('cBrand').value, model: document.getElementById('cModel').value, sn: document.getElementById('cSN').value, agent: document.getElementById('cAgent').value, start: document.getElementById('cStart').value, end: document.getElementById('cEnd').value, status: document.getElementById('cStatus').value };
+        if(idx == "-1") { contracts.push(obj); sync(obj, 'العقود'); } else { contracts[idx] = obj; document.getElementById('editIdxContract').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function closeFault(i) {
+        let f = activeFaults.splice(i, 1)[0];
+        f.closedDate = new Date().toLocaleDateString('ar-EG');
+        closedFaults.push(f); sync(f, 'الأعطال_المغلقة'); save();
+    }
+
+    function editDev(i) {
+        let d = devices[i]; document.getElementById('devDept').value = d.dept; document.getElementById('devName').value = d.name; document.getElementById('devBrand').value = d.brand; document.getElementById('devModel').value = d.model; document.getElementById('devSN').value = d.sn; document.getElementById('devAgent').value = d.agent;
+        document.getElementById('editIdxDev').value = i; window.scrollTo(0,0);
+    }
+    function editFault(i, type) {
+        let f = (type==='active') ? activeFaults[i] : closedFaults[i];
+        document.getElementById('fDeptForm').value = f.dept; document.getElementById('fDevice').value = f.device; document.getElementById('fBrand').value = f.brand; document.getElementById('fModel').value = f.model; document.getElementById('fSN').value = f.sn; document.getElementById('fDate').value = f.date; document.getElementById('fDesc').value = f.desc; document.getElementById('fActions').value = f.actions;
+        if(type==='active') document.getElementById('editIdxFault').value = i; window.scrollTo(0,0);
+    }
+    function editContract(i) {
+        let c = contracts[i]; document.getElementById('cDeptForm').value = c.dept; document.getElementById('cDevice').value = c.device; document.getElementById('cBrand').value = c.brand; document.getElementById('cModel').value = c.model; document.getElementById('cSN').value = c.sn; document.getElementById('cAgent').value = c.agent; document.getElementById('cStart').value = c.start; document.getElementById('cEnd').value = c.end; document.getElementById('cStatus').value = c.status;
+        document.getElementById('editIdxContract').value = i; window.scrollTo(0,0);
+    }
+
+    function renderAll() {
+        const fDev = document.getElementById('filterDev').value;
+        const fFlt = document.getElementById('filterFaults').value;
+        const fCon = document.getElementById('filterContracts').value;
+
+        // الأجهزة
+        let dList = (fDev === 'الكل' || !fDev) ? devices : devices.filter(d => d.dept === fDev);
+        document.querySelector('#devTable tbody').innerHTML = dList.map((d,i)=>`<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button class="btn btn-edit" onclick="editDev(${i})">✏️</button></td></tr>`).join('');
+
+        // الأعطال النشطة
+        let aList = (fFlt === 'الكل' || !fFlt) ? activeFaults : activeFaults.filter(f => f.dept === fFlt);
+        document.querySelector('#fActiveTable tbody').innerHTML = aList.map((f,i)=>`<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.brand}</td><td>${f.model}</td><td>${f.sn}</td><td>${f.desc}</td><td>${f.date}</td><td><button class="btn btn-close" onclick="closeFault(${i})">🔒</button><button class="btn btn-edit" onclick="editFault(${i},'active')">✏️</button></td></tr>`).join('');
+
+        // الأعطال المغلقة
+        let cList = (fFlt === 'الكل' || !fFlt) ? closedFaults : closedFaults.filter(f => f.dept === fFlt);
+        document.querySelector('#fClosedTable tbody').innerHTML = cList.map((f,i)=>`<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.brand}</td><td>${f.model}</td><td>${f.sn}</td><td>${f.closedDate}</td><td>${f.actions}</td><td><button class="btn btn-edit" onclick="editFault(${i},'closed')">✏️</button></td></tr>`).join('');
+
+        // العقود
+        let kList = (fCon === 'الكل' || !fCon) ? contracts : contracts.filter(c => c.dept === fCon);
+        document.querySelector('#cTable tbody').innerHTML = kList.map((c,i)=>{
+            let days = Math.ceil((new Date(c.end) - new Date())/(1000*60*60*24));
+            let cls = days < 0 ? 'expired-row' : (days < 60 ? 'warning-row' : '');
+            return `<tr class="${cls}"><td>${c.dept}</td><td>${c.device}</td><td>${c.brand}</td><td>${c.model}</td><td>${c.sn}</td><td>${c.agent}</td><td>${c.start || '-'}</td><td>${c.end || '-'}</td><td>${c.status}</td><td><button class="btn btn-edit" onclick="editContract(${i})">✏️</button></td></tr>`;
+        }).join('');
+
+        updateFilters();
+        
+        let expSoon = contracts.filter(c => {
+            let d = Math.ceil((new Date(c.end) - new Date())/(1000*60*60*24));
+            return d >= 0 && d < 60;
+        }).length;
+
+        document.getElementById('stats').innerHTML = `
+            <div class="stat-box"><h3>🏥 إجمالي الأجهزة</h3><h2>${devices.length}</h2></div>
+            <div class="stat-box" style="color:#b91c1c;"><h3>🔧 أعطال نشطة</h3><h2>${activeFaults.length}</h2></div>
+            <div class="stat-box" style="color:#1f8a4c;"><h3>✅ تم إصلاحها</h3><h2>${closedFaults.length}</h2></div>
+            <div class="stat-box" style="color:#f39c12;"><h3>📄 عقود أوشكت</h3><h2>${expSoon}</h2></div>
+        `;
+    }
+
+    function updateFilters() {
+        let dpts = [...new Set(devices.map(d => d.dept))];
+        ['filterDev', 'filterFaults', 'filterContracts', 'fDeptForm', 'cDeptForm'].forEach(id => {
+            let sel = document.getElementById(id);
+            if(!sel) return;
+            let cur = sel.value;
+            let options = (id === 'fDeptForm' || id === 'cDeptForm') ? dpts.map(d=>`<option value="${d}">${d}</option>`).join('') : '<option value="الكل">كل الأقسام</option>' + dpts.map(d=>`<option value="${d}">${d}</option>`).join('');
+            sel.innerHTML = options;
+            if(cur) sel.value = cur;
+        });
+    }
+
+    function printReport(type) {
+        let win = window.open('', '_blank');
+        let t = "", c = "";
+        if(type==='devices') { t="تقرير الأجهزة"; c=document.getElementById('devTable').outerHTML; }
+        else if(type==='activeFaults') { t="الأعطال النشطة"; c=document.getElementById('fActiveTable').outerHTML; }
+        else if(type==='closedFaults') { t="سجل الإصلاح"; c=document.getElementById('fClosedTable').outerHTML; }
+        else { t="تقرير العقود"; c=document.getElementById('cTable').outerHTML; }
+        win.document.write(`<html dir="rtl"><head><style>table{width:100%;border-collapse:collapse;} th,td{border:1px solid #000;padding:8px;text-align:right;} .btn{display:none;}</style></head><body><h2 style="text-align:center;">مستشفيات جامعة المنوفية</h2><h3>${t}</h3>${c}</body></html>`);
+        win.document.close(); win.print();
+    }
+
+    function resetForms() { document.querySelectorAll('input[type="text"], textarea, input[type="date"]').forEach(i => i.value = ''); document.querySelectorAll('input[type="hidden"]').forEach(i => i.value = '-1'); }
+    function showTab(id) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); }
+    document.getElementById('devDept').addEventListener('change', function(){ document.getElementById('devNewDept').style.display = this.value==='--- قسم جديد ---'?'block':'none'; });
+
+    save();
+</script>
+</body>
+</html>
