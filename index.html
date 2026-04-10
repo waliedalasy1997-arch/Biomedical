@@ -2,38 +2,229 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام صيانة الأجهزة الطبية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>نظام الهندسة الطبية - جامعة المنوفية</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7f6; padding: 15px; direction: rtl; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; font-size: 16px; }
-        .btn { background: #27ae60; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: #3498db; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #eef2f7; padding: 20px; }
+        .container { max-width: 1550px; margin: 0 auto; }
+        .card { background: white; border-radius: 24px; padding: 20px 25px; margin-bottom: 25px; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
+        .header-card { background: linear-gradient(135deg, #0b2b44, #1e4a76); color: white; text-align: center; }
+        .btn { border: none; padding: 8px 18px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin: 3px; }
+        .btn-success { background: #1f8a4c; color: white; }
+        .btn-info { background: #2c6e9e; color: white; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-close { background: #27ae60; color: white; }
+        input, select, textarea { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e6; font-size: 14px; width: 100%; background: #fff; margin-bottom: 5px; }
+        label { font-size: 12px; color: #64748b; display: block; margin-bottom: 2px; margin-right: 5px; }
+        .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 15px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1350px; }
+        th { background: #f8fafc; padding: 12px; text-align: right; color: #475569; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
+        .tab-btn { background: white; border: none; padding: 10px 22px; border-radius: 50px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .tab-btn.active { background: #1e4a76; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; align-items: end; }
+        .filter-bar { background: #f1f5f9; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .stat-box { background: #f0f7ff; padding: 20px; border-radius: 20px; flex: 1; min-width: 200px; text-align: center; border: 1px solid #d0e4f7; }
+        .expired-row { background: #ffeaea !important; }
+        .warning-row { background: #fff9e6 !important; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>🏥 تسجيل عطل جهاز طبي</h2>
-    
-    <label>القسم</label>
-    <select id="dept">
-        <option>العناية المركزة</option>
-        <option>الطوارئ</option>
-        <option>الأشعة</option>
-        <option>المناظير</option>
-        <option>العمليات</option>
-    </select>
+    <div class="card header-card">
+        <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+    </div>
 
-    <label>اسم الجهاز</label>
-    <input type="text" id="deviceName" placeholder="مثال: Monitor / Ventilator">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('dashboard')">📊 الإحصائيات</button>
+        <button class="tab-btn" onclick="showTab('devicesTab')">🩺 الأجهزة</button>
+        <button class="tab-btn" onclick="showTab('faultsTab')">🔧 الأعطال</button>
+        <button class="tab-btn" onclick="showTab('contractsTab')">📄 العقود</button>
+    </div>
 
+    <div id="dashboard" class="tab-content active">
+        <div class="card"><div style="display:flex; gap:15px; flex-wrap:wrap;" id="stats"></div></div>
+    </div>
+
+    <div id="devicesTab" class="tab-content">
+        <div class="card">
+            <h3>➕ إضافة / تعديل جهاز</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxDev" value="-1">
+                <div><label>القسم</label><select id="devDept"><option value="العناية المركزة">العناية المركزة</option><option value="الطوارئ">الطوارئ</option><option value="الأشعة">الأشعة</option><option value="المناظير">المناظير</option><option value="--- قسم جديد ---">--- قسم جديد ---</option></select></div>
+                <input type="text" id="devNewDept" placeholder="اسم القسم الجديد" style="display:none;">
+                <div><label>اسم الجهاز</label><input type="text" id="devName"></div>
+                <div><label>الماركة</label><input type="text" id="devBrand"></div>
+                <div><label>الموديل</label><input type="text" id="devModel"></div>
+                <div><label>S/N</label><input type="text" id="devSN"></div>
+                <div><label>الوكيل</label><input type="text" id="devAgent"></div>
+                <button class="btn btn-success" id="btnDev" onclick="addDevice()">➕ حفظ</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية بالقسم:</label>
+                <select id="filterDev" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('devices')">🖨️ طباعة التقرير</button>
+            </div>
+            <div class="table-wrapper"><table id="devTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="faultsTab" class="tab-content">
+        <div class="card">
+            <h3>⚠️ تسجيل بلاغ عطل</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxFault" value="-1">
+                <div><label>القسم</label><select id="fDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="fDevice"></div>
+                <div><label>الماركة</label><input type="text" id="fBrand"></div>
+                <div><label>الموديل</label><input type="text" id="fModel"></div>
+                <div><label>S/N</label><input type="text" id="fSN"></div>
+                <div><label>التاريخ</label><input type="date" id="fDate"></div>
+                <textarea id="fDesc" placeholder="وصف العطل"></textarea>
+                <textarea id="fActions" placeholder="الإجراءات المتخذة"></textarea>
+                <button class="btn btn-success" id="btnFault" onclick="addFault()">➕ تسجيل</button>
+            </div>
+            <h4>🔧 أعطال نشطة</h4>
+            <div class="table-wrapper"><table id="fActiveTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="contractsTab" class="tab-content">
+        <div class="card">
+            <h3>📄 إدارة العقود</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxContract" value="-1">
+                <div><label>القسم</label><select id="cDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="cDevice"></div>
+                <div><label>الماركة</label><input type="text" id="cBrand"></div>
+                <div><label>بداية العقد</label><input type="date" id="cStart"></div>
+                <div><label>نهاية العقد</label><input type="date" id="cEnd"></div>
+                <button class="btn btn-success" id="btnContract" onclick="addContract()">➕ حفظ العقد</button>
+            </div>
+            <div class="table-wrapper"><table id="cTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>بداية</th><th>نهاية</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+
+    // استعادة البيانات من الذاكرة المحلية أولاً لتجنب البطء
+    let devices = JSON.parse(localStorage.getItem('devices')) || [];
+    let activeFaults = JSON.parse(localStorage.getItem('activeFaults')) || [];
+    let closedFaults = JSON.parse(localStorage.getItem('closedFaults')) || [];
+    let contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+
+    // دالة لحفظ البيانات محلياً وتحديث الشكل
+    function saveLocally() {
+        localStorage.setItem('devices', JSON.stringify(devices));
+        localStorage.setItem('activeFaults', JSON.stringify(activeFaults));
+        localStorage.setItem('closedFaults', JSON.stringify(closedFaults));
+        localStorage.setItem('contracts', JSON.stringify(contracts));
+        renderAll();
+    }
+
+    // دالة المزامنة السحابية (Cloud Sync)
+    function syncToCloud(data, sheetName) {
+        let fd = new FormData();
+        fd.append('targetSheet', sheetName);
+        Object.keys(data).forEach(key => fd.append(key, data[key]));
+        
+        fetch(SCRIPT_URL, { method: 'POST', body: fd })
+        .then(() => console.log('تمت المزامنة مع جوجل بنجاح'))
+        .catch(err => console.log('فشل المزامنة، سيتم الحفظ محلياً فقط'));
+    }
+
+    // جلب البيانات من جوجل عند فتح الموقع (Cloud Load)
+    function loadFromCloud() {
+        fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            if(data && data.length > 0) {
+                // هنا بنوزع البيانات اللي جاية من الشيت على الجداول
+                // ده الجزء الاحترافي اللي بيخلي كل الأجهزة "تشوف" نفس الداتا
+                activeFaults = data.map(row => ({
+                    dept: row[1], device: row[2], model: row[3], desc: row[4], date: row[0]
+                }));
+                saveLocally();
+            }
+        });
+    }
+
+    // إضافة جهاز (مع مزامنة)
+    function addDevice() {
+        let idx = document.getElementById('editIdxDev').value;
+        let dpt = document.getElementById('devDept').value === '--- قسم جديد ---' ? document.getElementById('devNewDept').value : document.getElementById('devDept').value;
+        let obj = { dept: dpt, name: document.getElementById('devName').value, brand: document.getElementById('devBrand').value, model: document.getElementById('devModel').value, sn: document.getElementById('devSN').value, agent: document.getElementById('devAgent').value };
+        
+        if(idx == "-1") { 
+            devices.push(obj); 
+            syncToCloud(obj, 'الأجهزة'); 
+        } else { 
+            devices[idx] = obj; 
+            document.getElementById('editIdxDev').value = "-1"; 
+        }
+        saveLocally(); resetForms();
+    }
+
+    // إضافة عطل (مع مزامنة)
+    function addFault() {
+        let idx = document.getElementById('editIdxFault').value;
+        let obj = { dept: document.getElementById('fDeptForm').value, device: document.getElementById('fDevice').value, brand: document.getElementById('fBrand').value, model: document.getElementById('fModel').value, sn: document.getElementById('fSN').value, date: document.getElementById('fDate').value, desc: document.getElementById('fDesc').value, actions: document.getElementById('fActions').value };
+        
+        if(idx == "-1") { 
+            activeFaults.push(obj); 
+            syncToCloud(obj, 'الأعطال'); 
+        } else { 
+            activeFaults[idx] = obj; 
+            document.getElementById('editIdxFault').value = "-1"; 
+        }
+        saveLocally(); resetForms();
+    }
+
+    // دالة العرض (الرندر) كما هي في كودك
+    function renderAll() {
+        const fDev = document.getElementById('filterDev').value || 'الكل';
+        let dList = (fDev === 'الكل') ? devices : devices.filter(d => d.dept === fDev);
+        document.querySelector('#devTable tbody').innerHTML = dList.map((d,i)=>`<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button class="btn btn-edit" onclick="editDev(${i})">✏️</button></td></tr>`).join('');
+
+        // تحديث الإحصائيات
+        document.getElementById('stats').innerHTML = `
+            <div class="stat-box"><h3>🏥 إجمالي الأجهزة</h3><h2>${devices.length}</h2></div>
+            <div class="stat-box" style="color:#b91c1c;"><h3>🔧 أعطال نشطة</h3><h2>${activeFaults.length}</h2></div>
+        `;
+        updateFilters();
+    }
+
+    function updateFilters() {
+        let dpts = [...new Set(devices.map(d => d.dept))];
+        ['filterDev', 'fDeptForm', 'cDeptForm'].forEach(id => {
+            let sel = document.getElementById(id); if(!sel) return;
+            let options = (id === 'filterDev') ? '<option value="الكل">كل الأقسام</option>' : '';
+            sel.innerHTML = options + dpts.map(d=>`<option value="${d}">${d}</option>`).join('');
+        });
+    }
+
+    function showTab(id) { 
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); 
+        document.getElementById(id).classList.add('active'); 
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    }
+
+    function resetForms() { document.querySelectorAll('input, textarea').forEach(i => i.value = ''); }
+
+    // تشغيل عند التحميل
+    window.onload = () => {
+        renderAll();
+        loadFromCloud(); // سحب البيانات من السحابة أول ما الموقع يفتح
+    };
+</script>
+</body>
+</html>
     <label>الموديل / الماركة</label>
     <input type="text" id="model" placeholder="مثال: Nihon Kohden">
 
