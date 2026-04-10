@@ -47,6 +47,205 @@
     </div>
 
     <div id="dashboard" class="tab-content active">
+        <div class="card">
+            <div style="display:flex; gap:15px; flex-wrap:wrap;" id="stats">
+                </div>
+        </div>
+    </div>
+
+    <div id="devicesTab" class="tab-content">
+        <div class="card">
+            <h3>➕ إضافة / تعديل جهاز</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxDev" value="-1">
+                <div><label>القسم</label><select id="devDept"><option value="العناية المركزة">العناية المركزة</option><option value="الطوارئ">الطوارئ</option><option value="الأشعة">الأشعة</option><option value="--- قسم جديد ---">--- قسم جديد ---</option></select></div>
+                <input type="text" id="devNewDept" placeholder="اسم القسم الجديد" style="display:none;">
+                <div><label>اسم الجهاز</label><input type="text" id="devName"></div>
+                <div><label>الماركة</label><input type="text" id="devBrand"></div>
+                <div><label>الموديل</label><input type="text" id="devModel"></div>
+                <div><label>S/N</label><input type="text" id="devSN"></div>
+                <div><label>الوكيل</label><input type="text" id="devAgent"></div>
+                <button class="btn btn-success" id="btnDev" onclick="addDevice()">➕ حفظ</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية بالقسم:</label>
+                <select id="filterDev" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('devices')">🖨️ طباعة التقرير</button>
+            </div>
+            <div class="table-wrapper"><table id="devTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="faultsTab" class="tab-content">
+        <div class="card">
+            <h3>⚠️ تسجيل بلاغ عطل</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxFault" value="-1">
+                <div><label>القسم</label><select id="fDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="fDevice"></div>
+                <div><label>الماركة</label><input type="text" id="fBrand"></div>
+                <div><label>الموديل</label><input type="text" id="fModel"></div>
+                <div><label>S/N</label><input type="text" id="fSN"></div>
+                <div><label>التاريخ</label><input type="date" id="fDate"></div>
+                <textarea id="fDesc" placeholder="وصف العطل"></textarea>
+                <textarea id="fActions" placeholder="الإجراءات المتخذة"></textarea>
+                <button class="btn btn-success" id="btnFault" onclick="addFault()">➕ تسجيل</button>
+            </div>
+            <div class="filter-bar">
+                <label>🔍 تصفية الأعطال:</label>
+                <select id="filterFaults" onchange="renderAll()" style="width:200px;"></select>
+                <button class="btn btn-info" onclick="printReport('activeFaults')">🖨️ طباعة النشطة</button>
+            </div>
+            <h4>🔧 أعطال نشطة</h4>
+            <div class="table-wrapper"><table id="fActiveTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+            <h4 style="margin-top:20px;">✅ سجل الإصلاح</h4>
+            <div class="table-wrapper"><table id="fClosedTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>تاريخ الإصلاح</th><th>الإجراءات</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+
+    <div id="contractsTab" class="tab-content">
+        <div class="card">
+            <h3>📄 إدارة العقود</h3>
+            <div class="form-grid">
+                <input type="hidden" id="editIdxContract" value="-1">
+                <div><label>القسم</label><select id="cDeptForm"></select></div>
+                <div><label>الجهاز</label><input type="text" id="cDevice"></div>
+                <div><label>الماركة</label><input type="text" id="cBrand"></div>
+                <div><label>بداية العقد</label><input type="date" id="cStart"></div>
+                <div><label>نهاية العقد</label><input type="date" id="cEnd"></div>
+                <div><label>الحالة</label><input type="text" id="cStatus"></div>
+                <button class="btn btn-success" id="btnContract" onclick="addContract()">➕ حفظ</button>
+            </div>
+            <div class="table-wrapper"><table id="cTable"><thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>نهاية العقد</th><th>الحالة</th><th>إجراءات</th></tr></thead><tbody></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+
+    let devices = JSON.parse(localStorage.getItem('devices')) || [];
+    let activeFaults = JSON.parse(localStorage.getItem('activeFaults')) || [];
+    let closedFaults = JSON.parse(localStorage.getItem('closedFaults')) || [];
+    let contracts = JSON.parse(localStorage.getItem('contracts')) || [];
+
+    function save() {
+        localStorage.setItem('devices', JSON.stringify(devices));
+        localStorage.setItem('activeFaults', JSON.stringify(activeFaults));
+        localStorage.setItem('closedFaults', JSON.stringify(closedFaults));
+        localStorage.setItem('contracts', JSON.stringify(contracts));
+        renderAll();
+    }
+
+    function sync(data, sheet) {
+        let fd = new FormData(); fd.append('targetSheet', sheet);
+        Object.keys(data).forEach(k => fd.append(k, data[k]));
+        fetch(SCRIPT_URL, {method:'POST', body:fd}).catch(e=>console.log('Sync Error'));
+    }
+
+    function addDevice() {
+        let idx = document.getElementById('editIdxDev').value;
+        let dpt = document.getElementById('devDept').value === '--- قسم جديد ---' ? document.getElementById('devNewDept').value : document.getElementById('devDept').value;
+        let obj = { dept: dpt, name: document.getElementById('devName').value, brand: document.getElementById('devBrand').value, model: document.getElementById('devModel').value, sn: document.getElementById('devSN').value, agent: document.getElementById('devAgent').value };
+        if(idx == "-1") { devices.push(obj); sync(obj, 'الأجهزة'); } else { devices[idx] = obj; document.getElementById('editIdxDev').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addFault() {
+        let idx = document.getElementById('editIdxFault').value;
+        let obj = { dept: document.getElementById('fDeptForm').value, device: document.getElementById('fDevice').value, brand: document.getElementById('fBrand').value, model: document.getElementById('fModel').value, sn: document.getElementById('fSN').value, date: document.getElementById('fDate').value, desc: document.getElementById('fDesc').value, actions: document.getElementById('fActions').value };
+        if(idx == "-1") { activeFaults.push(obj); sync(obj, 'الأعطال'); } else { activeFaults[idx] = obj; document.getElementById('editIdxFault').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function addContract() {
+        let idx = document.getElementById('editIdxContract').value;
+        let obj = { dept: document.getElementById('cDeptForm').value, device: document.getElementById('cDevice').value, brand: document.getElementById('cBrand').value, start: document.getElementById('cStart').value, end: document.getElementById('cEnd').value, status: document.getElementById('cStatus').value };
+        if(idx == "-1") { contracts.push(obj); sync(obj, 'العقود'); } else { contracts[idx] = obj; document.getElementById('editIdxContract').value = "-1"; }
+        save(); resetForms();
+    }
+
+    function editDev(i) {
+        let d = devices[i]; document.getElementById('devDept').value = d.dept; document.getElementById('devName').value = d.name; document.getElementById('devBrand').value = d.brand; document.getElementById('devModel').value = d.model; document.getElementById('devSN').value = d.sn; document.getElementById('devAgent').value = d.agent;
+        document.getElementById('editIdxDev').value = i; showTab('devicesTab'); window.scrollTo(0,0);
+    }
+
+    function closeFault(i) {
+        let f = activeFaults.splice(i, 1)[0];
+        f.closedDate = new Date().toLocaleDateString('ar-EG');
+        closedFaults.push(f); sync(f, 'الأعطال_المغلقة'); save();
+    }
+
+    function renderAll() {
+        const fDev = document.getElementById('filterDev').value || 'الكل';
+        const fFlt = document.getElementById('filterFaults').value || 'الكل';
+
+        // الأجهزة
+        let dList = (fDev === 'الكل') ? devices : devices.filter(d => d.dept === fDev);
+        document.querySelector('#devTable tbody').innerHTML = dList.map((d,i)=>`<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button class="btn btn-edit" onclick="editDev(${i})">✏️</button></td></tr>`).join('');
+
+        // الأعطال النشطة
+        let aList = (fFlt === 'الكل') ? activeFaults : activeFaults.filter(f => f.dept === fFlt);
+        document.querySelector('#fActiveTable tbody').innerHTML = aList.map((f,i)=>`<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.brand}</td><td>${f.model}</td><td>${f.sn}</td><td>${f.desc}</td><td>${f.date}</td><td><button class="btn btn-close" onclick="closeFault(${i})">🔒</button></td></tr>`).join('');
+
+        // العقود
+        document.querySelector('#cTable tbody').innerHTML = contracts.map((c,i)=>`<tr><td>${c.dept}</td><td>${c.device}</td><td>${c.brand}</td><td>${c.end}</td><td>${c.status}</td><td><button class="btn btn-edit" onclick="editContract(${i})">✏️</button></td></tr>`).join('');
+
+        // الإحصائيات
+        document.getElementById('stats').innerHTML = `
+            <div class="stat-box"><h3>🏥 إجمالي الأجهزة</h3><h2>${devices.length}</h2></div>
+            <div class="stat-box" style="color:#b91c1c;"><h3>🔧 أعطال نشطة</h3><h2>${activeFaults.length}</h2></div>
+            <div class="stat-box" style="color:#1f8a4c;"><h3>✅ تم إصلاحها</h3><h2>${closedFaults.length}</h2></div>
+        `;
+        updateFilters();
+    }
+
+    function updateFilters() {
+        let dpts = [...new Set(devices.map(d => d.dept))];
+        ['filterDev', 'filterFaults', 'fDeptForm', 'cDeptForm'].forEach(id => {
+            let sel = document.getElementById(id); if(!sel) return;
+            let cur = sel.value;
+            let options = (id.startsWith('filter')) ? '<option value="الكل">كل الأقسام</option>' : '';
+            sel.innerHTML = options + dpts.map(d=>`<option value="${d}">${d}</option>`).join('');
+            if(cur) sel.value = cur;
+        });
+    }
+
+    function printReport(type) {
+        let win = window.open('', '_blank');
+        let t = (type==='devices') ? "تقرير الأجهزة" : "الأعطال النشطة";
+        let tableId = (type==='devices') ? 'devTable' : 'fActiveTable';
+        let content = document.getElementById(tableId).outerHTML;
+        win.document.write(`<html dir="rtl"><body><h2 style="text-align:center;">${t}</h2>${content}<style>table{width:100%;border-collapse:collapse;} th,td{border:1px solid black;padding:8px;text-align:center;} .btn{display:none;}</style></body></html>`);
+        win.document.close(); win.print();
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function resetForms() { document.querySelectorAll('input, textarea').forEach(i => i.value = ''); }
+
+    window.onload = renderAll;
+</script>
+</body>
+</html>
+<div class="container">
+    <div class="card header-card">
+        <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('dashboard')">📊 الإحصائيات</button>
+        <button class="tab-btn" onclick="showTab('devicesTab')">🩺 الأجهزة</button>
+        <button class="tab-btn" onclick="showTab('faultsTab')">🔧 الأعطال</button>
+        <button class="tab-btn" onclick="showTab('contractsTab')">📄 العقود</button>
+    </div>
+
+    <div id="dashboard" class="tab-content active">
         <div class="card"><div style="display:flex; gap:15px; flex-wrap:wrap;" id="stats"></div></div>
     </div>
 
