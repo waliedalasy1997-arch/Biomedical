@@ -3,37 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الهندسة الطبية - جامعة المنوفية</title>
+    <title>نظام الهندسة الطبية - المنوفية</title>
     <style>
         :root {
-            --main-blue: #2c5e8c;
-            --light-blue: #e2edf7;
-            --bg-color: #f0f2f5;
+            --primary-navy: #0b2b44;
+            --accent-blue: #1e4a76;
+            --glass-white: rgba(255, 255, 255, 0.85);
+            --border-light: #d1dae3;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); padding: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #eef2f7 0%, #d1dae3 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
 
-        /* Header - طبق الأصل من الصورة */
-        .header {
-            background-color: #1e4a76;
+        /* الهيدر العلوي */
+        .header-banner {
+            background-color: var(--accent-blue);
             color: white;
-            padding: 20px;
+            padding: 25px 0 45px 0;
             text-align: center;
-            border-radius: 20px;
-            margin: 10px auto 20px;
-            max-width: 95%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 0 0 60px 60px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 10;
         }
-        .header h1 { font-size: 24px; margin: 0; }
+        .header-banner h1 { font-size: 26px; font-weight: 600; }
 
-        /* Navigation Tabs */
-        .nav-container {
+        /* الأزرار العلوية */
+        .nav-bar {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-top: -25px;
+            position: relative;
+            z-index: 20;
         }
-        .nav-item {
+        .tab-btn {
+            background: white;
+            border: 1px solid var(--border-light);
+            padding: 12px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background-color: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        /* الكارت الرئيسي الزجاجي */
+        .main-container {
+            max-width: 96%;
+            margin: 30px auto;
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            border-radius: 35px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        /* تصميم فورم الإدخال - زي الصور بالظبط */
+        .form-card {
+            background: rgba(255,255,255,0.5);
+            border: 1px dashed #bbb;
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .form-title { font-weight: bold; color: #333; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        
+        .inputs-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .input-box { display: flex; flex-direction: column; flex: 1; min-width: 140px; }
+        .input-box label { font-size: 11px; color: #888; margin-bottom: 4px; margin-right: 5px; }
+        
+        input, select, textarea {
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #ced4da;
+            font-size: 13px;
+            outline: none;
+        }
+        .btn-action {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        /* الجداول */
+        .table-section h3 { font-size: 16px; margin: 20px 0 10px 0; color: #444; border-right: 4px solid var(--accent-blue); padding-right: 10px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        th { padding: 12px; text-align: right; color: #777; font-size: 13px; }
+        td { background: white; padding: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; font-size: 13px; }
+        td:first-child { border-right: 1px solid #eee; border-radius: 0 18px 18px 0; }
+        td:last-child { border-left: 1px solid #eee; border-radius: 18px 0 0 18px; }
+
+        /* الإحصائيات الملونة */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-item { 
+            background: #f8fafc; padding: 25px; border-radius: 25px; text-align: center; 
+            border: 1px solid #e2edf7; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .stat-item h4 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-item .val { font-size: 28px; font-weight: bold; color: var(--accent-blue); }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header-banner">
+    <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+</div>
+
+<div class="nav-bar">
+    <div class="tab-btn active" onclick="switchTab('devices')">🩺 الأجهزة</div>
+    <div class="tab-btn" onclick="switchTab('faults')">🔧 الأعطال</div>
+    <div class="tab-btn" onclick="switchTab('stats')">📊 الإحصائيات</div>
+    <div class="tab-btn" onclick="switchTab('contracts')">📄 العقود</div>
+</div>
+
+<div class="main-container">
+    
+    <div id="devices" class="tab-content">
+        <div class="form-card">
+            <div class="form-title">➕ إضافة / تعديل جهاز</div>
+            <div class="inputs-wrapper">
+                <div class="input-box"><label>القسم</label><select id="d_dept"><option>العناية المركزة</option><option>الطوارئ</option><option>التعقيم</option></select></div>
+                <div class="input-box"><label>اسم الجهاز</label><input type="text" id="d_name"></div>
+                <div class="input-box"><label>الماركة</label><input type="text" id="d_brand"></div>
+                <div class="input-box"><label>الموديل</label><input type="text" id="d_model"></div>
+                <div class="input-box"><label>S/N</label><input type="text" id="d_sn"></div>
+                <div class="input-box"><label>الوكيل</label><input type="text" id="d_agent"></div>
+                <button class="btn-action" onclick="pushToGoogle('devices')">➕ حفظ</button>
+            </div>
+        </div>
+        <table>
+            <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead>
+            <tbody id="list_devices"></tbody>
+        </table>
+    </div>
+
+    <div id="faults" class="tab-content hidden">
+        <div class="form-card">
+            <div class="form-title">⚠️ تسجيل بلاغ عطل</div>
+            <div class="inputs-wrapper">
+                <div class="input-box"><label>القسم</label><select id="f_dept"><option>التعقيم</option><option>عمليات المسالك</option></select></div>
+                <div class="input-box"><label>الجهاز</label><input type="text" id="f_dev"></div>
+                <div class="input-box"><label>الماركة</label><input type="text" id="f_brand"></div>
+                <div class="input-box"><label>S/N</label><input type="text" id="f_sn"></div>
+                <div class="input-box"><label>التاريخ</label><input type="date" id="f_date"></div>
+                <div class="input-box"><label>وصف العطل</label><input type="text" id="f_desc"></div>
+                <button class="btn-action" style="background:#1e4a76" onclick="pushToGoogle('faults')">📝 تسجيل</button>
+            </div>
+        </div>
+        <div class="table-section">
+            <h3>📌 أعطال نشطة</h3>
+            <table id="list_faults"><thead><tr><th>القسم</th><th>الجهاز</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <div id="stats" class="tab-content hidden">
+        <div class="stats-row">
+            <div class="stat-item"><h4>📋 إجمالي الأجهزة</h4><div id="st_dev" class="val">0</div></div>
+            <div class="stat-item" style="border-right: 5px solid #e74c3c;"><h4>⚠️ أعطال نشطة</h4><div id="st_fault" class="val" style="color:#e74c3c">0</div></div>
+            <div class="stat-item" style="border-right: 5px solid #27ae60;"><h4>✅ تم إصلاحها</h4><div class="val" style="color:#27ae60">1</div></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+    
+    let store = {
+        dev: JSON.parse(localStorage.getItem('off_d')) || [],
+        fault: JSON.parse(localStorage.getItem('off_f')) || []
+    };
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+    }
+
+    function pushToGoogle(type) {
+        let obj = { targetSheet: type === 'devices' ? 'الأجهزة' : 'الأعطال' };
+        if(type === 'devices') {
+            obj.dept = document.getElementById('d_dept').value;
+            obj.name = document.getElementById('d_name').value;
+            obj.brand = document.getElementById('d_brand').value;
+            obj.model = document.getElementById('d_model').value;
+            obj.sn = document.getElementById('d_sn').value;
+            obj.agent = document.getElementById('d_agent').value;
+            store.dev.push(obj);
+            localStorage.setItem('off_d', JSON.stringify(store.dev));
+        } else {
+            obj.dept = document.getElementById('f_dept').value;
+            obj.device = document.getElementById('f_dev').value;
+            obj.brand = document.getElementById('f_brand').value;
+            obj.sn = document.getElementById('f_sn').value;
+            obj.date = document.getElementById('f_date').value;
+            obj.desc = document.getElementById('f_desc').value;
+            store.fault.push(obj);
+            localStorage.setItem('off_f', JSON.stringify(store.fault));
+        }
+
+        fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams(obj) });
+        render();
+        alert("تم الحفظ بنجاح");
+    }
+
+    function render() {
+        document.getElementById('list_devices').innerHTML = store.dev.map(d => `<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer">✎</button></td></tr>`).join('');
+        document.querySelector('#list_faults tbody').innerHTML = store.fault.map(f => `<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.sn}</td><td>${f.desc}</td><td>${f.date}</td><td><button style="background:#f39c12; color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer">✎</button></td></tr>`).join('');
+        document.getElementById('st_dev').innerText = store.dev.length;
+        document.getElementById('st_fault').innerText = store.fault.length;
+    }
+    render();
+</script>
+</body>
+</html>
             background: var(--light-blue);
             padding: 10px 20px;
             border-radius: 12px;
