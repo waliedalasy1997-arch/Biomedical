@@ -2,38 +2,258 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>نظام الهندسة الطبية - مستشفيات جامعة المنوفية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الهندسة الطبية - جامعة المنوفية</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #eef2f7; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .card { background: white; border-radius: 24px; padding: 20px 25px; margin-bottom: 25px; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
-        .header-card { background: linear-gradient(135deg, #0b2b44, #1e4a76); color: white; text-align: center; }
-        .header-card h1 { font-size: 28px; margin-bottom: 5px; }
-        .header-card h2 { font-size: 20px; font-weight: normal; opacity: 0.9; }
-        .alert { background: #fff8e7; border-right: 5px solid #f1c40f; padding: 14px 20px; border-radius: 20px; margin-bottom: 25px; font-weight: bold; }
-        .alert-danger { background: #ffeaea; border-right-color: #e74c3c; color: #c0392b; }
-        .btn { border: none; padding: 8px 18px; border-radius: 40px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin: 3px; }
-        .btn-success { background: #1f8a4c; color: white; }
-        .btn-danger { background: #b91c1c; color: white; }
-        .btn-warning { background: #e67e22; color: white; }
-        .btn-info { background: #2c6e9e; color: white; }
-        .btn-close { background: #27ae60; color: white; }
-        input, select, textarea { padding: 10px 14px; border-radius: 16px; border: 1px solid #cbd5e6; font-size: 14px; width: 100%; background: #fff; }
-        textarea { resize: vertical; min-height: 70px; }
-        .table-wrapper { overflow-x: auto; margin-top: 20px; border-radius: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: #f1f5f9; padding: 14px 12px; text-align: right; font-weight: 600; }
-        td { padding: 12px; border-bottom: 1px solid #e4e9f0; }
-        .warning-row { background: #fff7e5; border-right: 3px solid #f39c12; }
-        .expired-row { background: #ffeaea; border-right: 3px solid #c0392b; }
-        .closed-row { background: #e8f5e9; }
-        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; justify-content: center; }
-        .tab-btn { background: white; border: none; padding: 10px 22px; border-radius: 50px; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .tab-btn.active { background: #1e4a76; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        :root {
+            --primary-blue: #1e4a76;
+            --header-bg: #2c5e8c;
+            --bg-light: #f4f7f9;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg-light); color: #333; }
+        
+        /* Header Style from Photo */
+        .main-header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 0 0 50px 50px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .main-header h1 { font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* Tabs Style */
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 8px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+            color: #555;
+        }
+        .tab-btn.active { background-color: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+        .container { max-width: 95%; margin: 0 auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+
+        /* Stats Cards from Photo */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #f8fafc; border: 1px solid #e2edf7; border-radius: 15px; padding: 15px; text-align: center; }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .value { font-size: 24px; font-weight: bold; color: var(--primary-blue); }
+
+        /* Forms Layout */
+        .form-section { background: #fdfdfd; border: 1px dashed #ccc; border-radius: 15px; padding: 15px; margin-bottom: 20px; }
+        .form-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-weight: bold; color: #444; }
+        .input-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        input, select, textarea { 
+            background: #fff; border: 1px solid #d1d9e6; padding: 10px; border-radius: 10px; font-size: 13px; flex: 1; min-width: 150px;
+        }
+        .btn-save { background-color: #27ae60; color: white; border: none; padding: 10px 25px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        
+        /* Table Style */
+        .table-container { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 13px; }
+        th { background-color: #f1f5f9; padding: 12px; border-bottom: 2px solid #e2e8f0; text-align: right; color: #475569; }
+        td { padding: 10px; border-bottom: 1px solid #f1f5f9; }
+        
+        .hidden { display: none; }
+        .edit-btn { background: #f39c12; color: white; border: none; padding: 5px; border-radius: 50%; cursor: pointer; width: 30px; height: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="main-header">
+    <h1>🏥 مستشفيات جامعة المنوفية - الهندسة الطبية</h1>
+</div>
+
+<div class="nav-tabs">
+    <div class="tab-btn" onclick="showTab('stats-tab')">📊 الإحصائيات</div>
+    <div class="tab-btn active" onclick="showTab('devices-tab')">🩺 الأجهزة</div>
+    <div class="tab-btn" onclick="showTab('faults-tab')">🔧 الأعطال</div>
+    <div class="tab-btn" onclick="showTab('contracts-tab')">📄 العقود</div>
+</div>
+
+<div class="container">
+    
+    <div id="stats-tab" class="tab-content hidden">
+        <div class="stats-grid">
+            <div class="stat-card"><h3>📋 إجمالي الأجهزة</h3><div id="totalDevices" class="value">0</div></div>
+            <div class="stat-card" style="border-right: 4px solid #e74c3c;"><h3>⚠️ أعطال نشطة</h3><div id="activeFaultsCount" class="value" style="color:#e74c3c">0</div></div>
+            <div class="stat-card" style="border-right: 4px solid #27ae60;"><h3>✅ تم إصلاحها</h3><div id="fixedFaultsCount" class="value" style="color:#27ae60">0</div></div>
+            <div class="stat-card"><h3>📄 عقود أوشكت</h3><div id="expiringContracts" class="value" style="color:#f39c12">0</div></div>
+        </div>
+    </div>
+
+    <div id="devices-tab" class="tab-content">
+        <div class="form-section">
+            <div class="form-header">➕ إضافة / تعديل جهاز</div>
+            <div class="input-grid">
+                <select id="devDept"><option value="العناية المركزة">العناية المركزة</option><option value="الطوارئ">الطوارئ</option><option value="الأشعة">الأشعة</option><option value="التعقيم">التعقيم</option></select>
+                <input type="text" id="devName" placeholder="اسم الجهاز">
+                <input type="text" id="devBrand" placeholder="الماركة">
+                <input type="text" id="devModel" placeholder="الموديل">
+                <input type="text" id="devSN" placeholder="S/N">
+                <input type="text" id="devAgent" placeholder="الوكيل">
+                <button class="btn-save" onclick="saveData('devices')">➕ حفظ</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="devicesTable">
+                <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>الموديل</th><th>S/N</th><th>الوكيل</th><th>إجراءات</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="faults-tab" class="tab-content hidden">
+        <div class="form-section">
+            <div class="form-header">⚠️ تسجيل بلاغ عطل</div>
+            <div class="input-grid">
+                <select id="faultDept"><option value="التعقيم">التعقيم</option><option value="عمليات المسالك">عمليات المسالك</option></select>
+                <input type="text" id="faultDevice" placeholder="الجهاز">
+                <input type="text" id="faultBrand" placeholder="الماركة">
+                <input type="text" id="faultSN" placeholder="S/N">
+                <input type="date" id="faultDate">
+                <textarea id="faultDesc" placeholder="وصف العطل"></textarea>
+                <textarea id="faultActions" placeholder="الإجراءات المتخذة"></textarea>
+                <button class="btn-save" style="background:#2980b9" onclick="saveData('faults')">📝 تسجيل</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="faultsTable">
+                <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>S/N</th><th>الوصف</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="contracts-tab" class="tab-content hidden">
+        <div class="form-section">
+            <div class="form-header">📄 إدارة العقود</div>
+            <div class="input-grid">
+                <select id="contDept"><option value="عمليات المسالك">عمليات المسالك</option></select>
+                <input type="text" id="contDevice" placeholder="الجهاز">
+                <input type="text" id="contBrand" placeholder="الماركة">
+                <input type="text" id="contSN" placeholder="S/N">
+                <input type="date" id="contStart" placeholder="بداية العقد">
+                <input type="date" id="contEnd" placeholder="نهاية العقد">
+                <input type="text" id="contStatus" placeholder="الحالة">
+                <button class="btn-save" onclick="saveData('contracts')">➕ حفظ العقد</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table id="contractsTable">
+                <thead><tr><th>القسم</th><th>الجهاز</th><th>الماركة</th><th>S/N</th><th>بداية العقد</th><th>نهاية العقد</th><th>الحالة</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyP8LauSgzW2j97t0GcmbOglKWKDyBcEU6rRCAuuHYnNLEHp9U6GR1CdE9YGCOAbihG/exec';
+
+    // Local Storage Data
+    let db = {
+        devices: JSON.parse(localStorage.getItem('db_devices')) || [],
+        faults: JSON.parse(localStorage.getItem('db_faults')) || [],
+        contracts: JSON.parse(localStorage.getItem('db_contracts')) || []
+    };
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.remove('hidden');
+        event.currentTarget.classList.add('active');
+    }
+
+    function saveData(type) {
+        let payload = {};
+        if(type === 'devices') {
+            payload = { 
+                targetSheet: 'الأجهزة',
+                dept: document.getElementById('devDept').value,
+                name: document.getElementById('devName').value,
+                brand: document.getElementById('devBrand').value,
+                model: document.getElementById('devModel').value,
+                sn: document.getElementById('devSN').value,
+                agent: document.getElementById('devAgent').value
+            };
+        } else if(type === 'faults') {
+            payload = {
+                targetSheet: 'الأعطال',
+                dept: document.getElementById('faultDept').value,
+                device: document.getElementById('faultDevice').value,
+                brand: document.getElementById('faultBrand').value,
+                sn: document.getElementById('faultSN').value,
+                date: document.getElementById('faultDate').value,
+                desc: document.getElementById('faultDesc').value,
+                actions: document.getElementById('faultActions').value
+            };
+        } else if(type === 'contracts') {
+            payload = {
+                targetSheet: 'العقود',
+                dept: document.getElementById('contDept').value,
+                device: document.getElementById('contDevice').value,
+                brand: document.getElementById('contBrand').value,
+                sn: document.getElementById('contSN').value,
+                start: document.getElementById('contStart').value,
+                end: document.getElementById('contEnd').value,
+                status: document.getElementById('contStatus').value
+            };
+        }
+
+        // 1. Sync Online
+        fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams(payload) })
+        .then(() => console.log("Synced Online"))
+        .catch(err => alert("خطأ في الاتصال بالإنترنت، سيتم الحفظ محلياً"));
+
+        // 2. Save Locally
+        db[type].push(payload);
+        localStorage.setItem('db_' + type, JSON.stringify(db[type]));
+        renderAll();
+        alert("تم الحفظ بنجاح");
+    }
+
+    function renderAll() {
+        // Devices Table
+        document.querySelector('#devicesTable tbody').innerHTML = db.devices.map(d => 
+            `<tr><td>${d.dept}</td><td>${d.name}</td><td>${d.brand}</td><td>${d.model}</td><td>${d.sn}</td><td>${d.agent}</td><td><button class="edit-btn">✎</button></td></tr>`
+        ).join('');
+
+        // Faults Table
+        document.querySelector('#faultsTable tbody').innerHTML = db.faults.map(f => 
+            `<tr><td>${f.dept}</td><td>${f.device}</td><td>${f.brand}</td><td>${f.sn}</td><td>${f.desc}</td><td>${f.date}</td><td><button class="edit-btn">✎</button></td></tr>`
+        ).join('');
+
+        // Contracts Table
+        document.querySelector('#contractsTable tbody').innerHTML = db.contracts.map(c => 
+            `<tr><td>${c.dept}</td><td>${c.device}</td><td>${c.brand}</td><td>${c.sn}</td><td>${c.start}</td><td>${c.end}</td><td>${c.status}</td></tr>`
+        ).join('');
+
+        // Update Stats
+        document.getElementById('totalDevices').innerText = db.devices.length;
+        document.getElementById('activeFaultsCount').innerText = db.faults.length;
+    }
+
+    window.onload = renderAll;
+</script>
+</body>
+</html>
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; align-items: end; }
         .stats-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
         .stat-box { background: #f8fafc; padding: 18px 25px; border-radius: 28px; flex: 1; text-align: center; border: 1px solid #e2edf7; }
